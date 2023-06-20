@@ -7,6 +7,9 @@ from xl_helper import ExcelSheet
 
 
 def camel_to_space(name):
+    """
+    Convert CamelCase to space separated
+    """
     name = re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1 \2', name)
 
@@ -43,6 +46,9 @@ def get_savings_plans_recommendations(profile, term="ONE_YEAR", payment_options=
 
 
 def is_float(value):
+    """
+    Check if a value is a float
+    """
     try:
         float(value)
         return True
@@ -86,8 +92,10 @@ def write_sp_to_excel(xl, profiles, terms = ['ONE_YEAR', 'THREE_YEARS'], payment
 
                 headers = []
                 values = []
-                formats = [xl.PLAIN, xl.PLAIN, xl.PLAIN, xl.NUMBER, xl.CURRENCY, xl.CURRENCY, xl.PLAIN, xl.CURRENCY, xl.CURRENCY, xl.CURRENCY,
-                        xl.CURRENCY, xl.DECIMAL, xl.CURRENCY, xl.CURRENCY, xl.CURRENCY, xl.CURRENCY, xl.CURRENCY, xl.CURRENCY]
+                formats = [xl.PLAIN, xl.PLAIN, xl.PLAIN, xl.NUMBER, xl.CURRENCY, 
+                            xl.CURRENCY, xl.PLAIN, xl.CURRENCY, xl.CURRENCY, xl.CURRENCY,
+                            xl.CURRENCY, xl.DECIMAL, xl.CURRENCY, xl.CURRENCY, xl.CURRENCY, 
+                            xl.CURRENCY, xl.CURRENCY, xl.CURRENCY]
                 for k, v in sp_rec.items():
                     if not isinstance(v, dict):
                         # add this value to Excel worksheet with space instead of CamelCase
@@ -101,7 +109,8 @@ def write_sp_to_excel(xl, profiles, terms = ['ONE_YEAR', 'THREE_YEARS'], payment
                 xl.add_conditional_format_column(worksheet_name, index)
                 xl.add_autofilter(worksheet_name, len(values))
 
-def get_reservation_recommendations(profile, service, term='ONE_YEAR', payment_options="NO_UPFRONT", look_back_period='SIXTY_DAYS'):
+def get_reservation_recommendations(profile, service, term='ONE_YEAR', 
+                                    payment_options="NO_UPFRONT", look_back_period='SIXTY_DAYS'):
     """
     Fetch the Cost Explorer reservation recommendations
     """
@@ -202,11 +211,21 @@ if __name__ == "__main__":
                         default=True,
                         required=False,
                         dest='run_ri')
+    parser.add_argument('-i', '--ignore-these-profiles',
+                        help="Comma separated list of profiles to ignore in the aws config that exist: 'aws configure list-profiles'",
+                        required=False,
+                        default='default',
+                        dest='ignore_profiles')
+    parser.add_argument('-op', '--output-file-prefix',
+                        help="Output file prefix",
+                        required=False,
+                        default='CostSavingRecommendations',
+                        dest='output_file_prefix')
     args = parser.parse_args()
 
-    ignore_profiles = ['default', 'Billing', 'CostReportAdmin']
+    ignore_profiles = args.ignore_profiles.split(',')
     profiles = get_profiles(ignore_profiles)
-    file_name_prefix = 'CostSavingRecommendations'
+    file_name_prefix = args.output_file_prefix
     xl = ExcelSheet(file_name_prefix)
     if args.run_sp:
         write_sp_to_excel(xl, profiles, terms=args.term_in_years.split(','), payment_options=args.payment_options.split(','))

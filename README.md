@@ -11,7 +11,13 @@ Example screenshot taken on a Mac with Account Alias and Account Id anonymized.
 ## Prerequisites
 
 - Python3 and pip3.
-- AWS CLI setup and configured with all profiles that.
+- AWS CLI setup and configured with all profiles that. 
+
+To see all the AWS profiles
+
+```sh
+aws configure list-profiles
+```
 
 ## Setup
 
@@ -28,7 +34,7 @@ pip3 install -r requirements.txt
 Run the script to generate Excel file
 
 ```bash
-python3 cost_savings_recommendations_to_excel.py
+python3 cost_saving_recommendations_to_excel.py
 ```
 
 ### Arguments
